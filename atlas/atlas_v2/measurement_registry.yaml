@@ -1,0 +1,257 @@
+# Phase-1 registry for the confirmatory 12-construct measurement study.
+# This file does not replace or modify atlas/pilot_registry.yaml. The expected
+# effect matrix is inherited verbatim from that frozen registry and its hash is
+# checked by atlas_phase1.py.
+
+version: atlas_v2_phase1_quality_gate_v2_claude_prerun_c1c2
+status: frozen_for_technical_pilot_only
+# Pre-run corrections by Claude (2026-11-04, before any atlas_v2 model output; reports/atlas_claude/PRERUN_CORRECTIONS.md):
+#   C1 prompts use the original atlas scale wording; C2 explicit item anchors; C5 pending human validation listed.
+validation_pending:  # all six families of each; results are provisional until a human manipulation check passes
+  - fear.uncertainty
+  - satisfaction.exceeded_expectations
+  - sadness.uncontrollable
+  - blame.preventable
+parent_registry: atlas/pilot_registry.yaml
+parent_registry_sha256: 15ce07a733733c5e2fd766f4900ded62562a15decdf8e65b1674d79192a75af2
+expected_matrix_sha256: b40d021e4c05f1f34d09e7f429b20c1c65462c20efa026be366d38236fb2bc7b
+conditions: [A_simple, B_inclusion, C_inclusion_exclusions, D_indicators]
+
+aggregation:
+  default: equal_weight_mean_all_three
+  score_basis: expected_rating_conditional_on_a_nonzero_digit
+  primary_missing_policy: no_indicator_dropped
+  diagnostic_missing_policy: mean_modal_nonzero_items
+  all_modal_zero_policy: retain_primary_score_and_flag_all_missing
+  minimum_answered_for_diagnostic: 1
+  note: >-
+    Equal weights are used only because the cited theories do not provide
+    validated cross-indicator weights for this benchmark. The primary composite
+    is the mean of all three item scores, so selective modal abstention cannot
+    change the weights. The mean over modal-nonzero items is retained only as a
+    diagnostic. Every indicator score, coverage count, abstention value, primary
+    composite, and diagnostic composite must be reported separately. No weight
+    may be estimated from held-out ratings or atlas_v2 outcomes.
+
+constructs:
+  anger:
+    inclusion: >-
+      ANGER = an emotional response to a harm or obstruction that the writer
+      attributes to another person and appraises as illegitimate, often with an
+      urge to confront or retaliate.
+    exclusions: >-
+      Sadness about losses nobody caused and general negativity are not anger.
+    c_matches_existing_definition: true
+    indicator_questions:
+      other_caused: "To what extent does the text say that another person caused the harm or obstruction?"
+      illegitimate_obstruction: "To what extent does the text describe the obstruction as illegitimate or unfair?"
+      confront_urge: "To what extent does the writer want to confront or retaliate?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      other_caused: {low: "caused by impersonal circumstances", high: "caused by another person"}
+      illegitimate_obstruction: {low: "blocked for a legitimate reason", high: "blocked illegitimately or unfairly"}
+      confront_urge: {low: "inclined to let it go", high: "strong urge to confront or retaliate"}
+
+  sadness:
+    inclusion: >-
+      SADNESS = an emotional response to an irrevocable loss, typically appraised
+      as beyond anyone's control, often with low energy and withdrawal.
+    exclusions: >-
+      Anger at someone who caused harm and worry about the future are not sadness.
+    c_matches_existing_definition: true
+    indicator_questions:
+      irrevocable_loss: "To what extent does the text describe a valued loss as permanent or irrevocable?"
+      uncontrollable: "To what extent does the text say that the setback cannot be controlled or repaired?"
+      withdrawal: "To what extent does the text describe low energy and withdrawal from activity?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      irrevocable_loss: {low: "the loss is temporary and will be recovered", high: "a valued thing is lost for good"}
+      uncontrollable: {low: "the writer can still fix it", high: "nothing anyone can do about it"}
+      withdrawal: {low: "keeping active and engaged", high: "low energy and withdrawal"}
+
+  fear:
+    inclusion: >-
+      FEAR = an emotional response to a possible future harm, appraised as
+      uncertain and hard to cope with, often with an urge to avoid or escape.
+    exclusions: >-
+      Sadness about losses that already happened is not fear.
+    c_matches_existing_definition: true
+    indicator_questions:
+      future_threat: "To what extent does the text describe a harmful event that may still happen?"
+      uncertainty: "To what extent is it uncertain whether or how the possible harm will happen?"
+      low_coping: "To what extent does the writer feel unable to cope and inclined to avoid or escape?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      future_threat: {low: "the danger has already passed", high: "a harm may still happen"}
+      uncertainty: {low: "the outcome is already settled", high: "it is unclear whether or how the harm will happen"}
+      low_coping: {low: "feels able to handle it", high: "feels unable to cope and wants to avoid it"}
+
+  loneliness:
+    inclusion: >-
+      LONELINESS = a perceived lack of meaningful connection with others: lacking
+      companionship, feeling excluded, or feeling cut off from others.
+    exclusions: >-
+      It is not the same as having little contact with people or general sadness.
+    c_matches_existing_definition: true
+    indicator_questions:
+      no_confidant: "To what extent does the writer lack someone they can confide in?"
+      excluded: "To what extent does the writer feel excluded or left out by others?"
+      unseen: "To what extent does the writer feel unseen, misunderstood, or emotionally cut off from others?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      no_confidant: {low: "has a reliable confidant", high: "has nobody to confide in"}
+      excluded: {low: "invited and involved", high: "not invited or overlooked by others"}
+      unseen: {low: "feels understood and close to others", high: "feels unseen and emotionally apart from others"}
+
+  isolation:
+    inclusion: >-
+      OBJECTIVE SOCIAL ISOLATION = having few social ties, infrequent interaction
+      with others, and little participation in social activities, regardless of
+      how the person feels about it.
+    exclusions: >-
+      Feeling misunderstood or unwanted is not objective isolation.
+    c_matches_existing_definition: true
+    indicator_questions:
+      small_network: "How few people are present in the writer's social network?"
+      rare_contact: "How infrequently does the writer interact with other people?"
+      low_participation: "How little does the writer participate in groups or community activities?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      small_network: {low: "many friends and relatives", high: "very few people in the writer's life"}
+      rare_contact: {low: "interacts with people daily", high: "rarely interacts with anyone"}
+      low_participation: {low: "active in clubs and groups", high: "takes part in no group or community activities"}
+
+  belonging:
+    inclusion: >-
+      BELONGING = feeling accepted and valued by a group, fitting in with it, and
+      having stable, caring relationships.
+    exclusions: >-
+      How often a person meets others is not by itself belonging.
+    c_matches_existing_definition: true
+    indicator_questions:
+      accepted: "To what extent does a group accept and value the writer?"
+      fits_in: "To what extent does the writer feel that they fit in with the group?"
+      lasting_bonds: "To what extent does the writer have stable, lasting, caring relationships?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      accepted: {low: "the group rejects the writer", high: "the group accepts and values the writer"}
+      fits_in: {low: "feels like the odd one out", high: "feels like one of the group"}
+      lasting_bonds: {low: "relationships that keep falling apart", high: "stable, lasting, caring relationships"}
+
+  satisfaction:
+    inclusion: >-
+      SATISFACTION = the writer's evaluation of a specific service, product or
+      experience: its quality, how it compared with what they expected, and
+      whether it was worth what they paid.
+    exclusions: >-
+      Moods or events unrelated to it do not count.
+    c_matches_existing_definition: true
+    indicator_questions:
+      quality: "How well did the described service, product, or experience perform?"
+      exceeded_expectations: "How did it compare with the writer's prior expectations?"
+      value_for_money: "How good was its value relative to its price?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      quality: {low: "performed poorly", high: "performed well"}
+      exceeded_expectations: {low: "worse than expected", high: "better than expected"}
+      value_for_money: {low: "overpriced", high: "good value for the price"}
+
+  trust:
+    inclusion: >-
+      TRUST = willingness to rely on a person or organization, based on their
+      competence, their care for the writer's interests, and their honesty and
+      consistency.
+    exclusions: >-
+      Liking a single outcome is not by itself trust.
+    c_matches_existing_definition: true
+    indicator_questions:
+      ability: "How competent is the person or organization described in the text?"
+      benevolence: "To what extent do they look after the writer's interests rather than only their own?"
+      integrity: "To what extent do they keep promises, tell the truth, and act consistently?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      ability: {low: "incompetent", high: "competent"}
+      benevolence: {low: "look out only for their own interests", high: "look out for the writer's interests"}
+      integrity: {low: "break promises and mislead", high: "keep promises and tell the truth"}
+
+  fairness:
+    inclusion: >-
+      PERCEIVED FAIRNESS = the writer's judgement that outcomes matched
+      contributions, that decisions followed consistent and unbiased procedures,
+      and that they were treated with dignity and respect.
+    exclusions: >-
+      Getting a good outcome is not by itself fair treatment.
+    c_matches_existing_definition: true
+    indicator_questions:
+      distributive: "To what extent did the outcome match the writer's contribution?"
+      procedural: "To what extent did the decision follow consistent, unbiased procedures and allow the writer to be heard?"
+      interpersonal: "To what extent was the writer treated with dignity and respect?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      distributive: {low: "the outcome did not match the writer's contribution", high: "the outcome matched the writer's contribution"}
+      procedural: {low: "arbitrary or biased rules", high: "consistent, unbiased rules with a chance to be heard"}
+      interpersonal: {low: "treated rudely or demeaningly", high: "treated with dignity and respect"}
+
+  blame:
+    inclusion: >-
+      BLAME = a judgement that a person is responsible for a bad outcome: they
+      caused it, they could and should have prevented it, and they had no good
+      reason for acting as they did.
+    exclusions: >-
+      Feeling upset is not by itself blame.
+    c_matches_existing_definition: true
+    indicator_questions:
+      agent_caused: "To what extent did a person cause the bad outcome?"
+      preventable: "To what extent could and should that person have prevented the outcome?"
+      unjustified: "To what extent did the person act without an adequate reason or justification?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      agent_caused: {low: "a non-human cause", high: "a person caused the bad outcome"}
+      preventable: {low: "could not have known or prevented it", high: "could and should have prevented it"}
+      unjustified: {low: "had a good reason, such as an emergency", high: "acted without a good reason"}
+
+  intentionality:
+    inclusion: >-
+      INTENTIONALITY = the degree to which an action was done on purpose: the
+      person wanted the outcome, decided to act in advance, and was aware of what
+      they were doing.
+    exclusions: >-
+      Whether the outcome was good or bad is irrelevant.
+    c_matches_existing_definition: true
+    indicator_questions:
+      desire: "To what extent did the person want the outcome?"
+      planned: "To what extent did the person decide or plan the action in advance?"
+      aware: "To what extent was the person aware of what they were doing?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      desire: {low: "did not want the outcome", high: "wanted the outcome"}
+      planned: {low: "happened on the spur of the moment", high: "decided and planned it in advance"}
+      aware: {low: "absent-minded and unaware", high: "fully aware of what they were doing"}
+
+  political_stance:
+    inclusion: >-
+      POLITICAL STANCE = the writer's position on a left-right axis, inferred from
+      the positions they support: accepting economic inequality rather than
+      reducing it, preferring tradition to social change, and favouring punishment
+      over rehabilitation are right-leaning; the opposites are left-leaning.
+    exclusions: >-
+      Tone and topic alone are not evidence.
+    c_matches_existing_definition: true
+    indicator_questions:
+      economic: "What position does the writer take on reducing economic inequality through redistribution?"
+      social_change: "What position does the writer take on preserving tradition versus supporting social change?"
+      criminal_justice: "What position does the writer take on punishment versus rehabilitation in criminal justice?"
+    indicator_anchors:  # clean low/high anchors for condition D (pre-run correction C2, Claude 2026-11-04)
+      economic: {low: "supports redistribution to reduce inequality", high: "opposes redistribution to reduce inequality"}
+      social_change: {low: "supports social change", high: "prefers tradition"}
+      criminal_justice: {low: "favours rehabilitation", high: "favours tougher punishment"}
+
+causal_screening:
+  status: selected_before_new_outcomes
+  models: [Qwen/Qwen2.5-7B-Instruct, meta-llama/Llama-3.1-8B-Instruct]
+  indicators:
+    anger: illegitimate_obstruction
+    sadness: irrevocable_loss
+    fear: future_threat
+    loneliness: no_confidant
+    isolation: rare_contact
+    belonging: accepted
+    satisfaction: quality
+    trust: ability
+    fairness: procedural
+    blame: preventable
+    intentionality: planned
+    political_stance: economic
+  selection_rule: >-
+    One theoretically central indicator with a clean, concrete manipulation per
+    construct. Selection is independent of all atlas_v2 outcomes. This is causal
+    screening and not comprehensive construct-level causal validation.

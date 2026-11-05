@@ -1,0 +1,409 @@
+# Measurement-atlas pilot registry, version pilot_v1.
+#
+# FROZEN before any model scoring. The expected construct-by-indicator matrix below must not be changed after
+# results are inspected; atlas.py writes its SHA-256 hash (and that of this file) to every run manifest.
+#
+# Expected-matrix coding (cell = effect of an indicator's high pole vs its low pole on a rating):
+#   magnitude 2  indicator is central to the rated construct
+#   magnitude 1  theory permits a related but weaker effect (a rater could legitimately use this evidence)
+#   magnitude 0  predicted null: the evidence is irrelevant to the rated construct           (default)
+#   NA           no defensible prediction
+# Nonzero cells carry a sign: the direction in which the high pole should move the rating.
+# Each indicator's own construct is always +2 (high pole = more of the construct).
+# Cells not listed under an indicator's `expected` are 0.
+#
+# Rating format (atlas.py): 0 = not enough evidence in the text; 1 = very low or clearly absent; 2-4 increasing;
+# 5 = very high. political_stance is bipolar: 1 = clearly progressive/left, 5 = clearly conservative/right.
+#
+# valence_shift: whether the high pole is also more pleasant (+1), more unpleasant (-1) or matched (0) in wording.
+# It is a design annotation, not a prediction: a shared valence dimension in the results can come from the stimuli.
+#
+# Item wording: no questionnaire items are reproduced. Indicators paraphrase the underlying theoretical components.
+# This is an exploratory, machine-constructed benchmark; it has not been validated by human raters.
+
+version: pilot_v1
+frozen: true
+rating_order: [anger, sadness, fear, loneliness, isolation, belonging, satisfaction, trust, fairness, blame,
+               intentionality, political_stance]
+families:
+  affect: [anger, sadness, fear]
+  social_connection: [loneliness, isolation, belonging]
+  evaluation: [satisfaction, trust, fairness]
+  agency_politics: [blame, intentionality, political_stance]
+
+constructs:
+
+  anger:
+    family: affect
+    question: "How angry is the writer?"
+    anchors: {low: "not at all angry", high: "extremely angry"}
+    definition: >-
+      ANGER = an emotional response to a harm or obstruction that the writer attributes to another person and
+      appraises as illegitimate, often with an urge to confront or retaliate. Sadness about losses nobody caused and
+      general negativity are not anger.
+    source: >-
+      Smith, C. A., & Ellsworth, P. C. (1985). Patterns of cognitive appraisal in emotion. JPSP 48(4), 813-838,
+      doi:10.1037/0022-3514.48.4.813; Lazarus, R. S. (1991). Emotion and Adaptation. Oxford University Press;
+      Frijda, N. H., Kuipers, P., & ter Schure, E. (1989). Relations among emotion, appraisal, and emotional action
+      readiness. JPSP 57(2), 212-228, doi:10.1037/0022-3514.57.2.212.
+    licensing: "Theory papers; no scale items used."
+    neighbors: [blame, fairness, sadness]
+    proxies: [negative valence, arousal/intensity, presence of a human agent]
+    indicators:
+      other_caused:
+        description: "harm caused by another person (high) vs by impersonal circumstances (low)"
+        valence_shift: 0
+        expected: {blame: "+1", sadness: "-1", intentionality: NA, trust: NA, fairness: NA}
+        rationale: >-
+          Other-agency is the anger-specific appraisal (Smith & Ellsworth); a responsible person also licenses blame;
+          circumstantial agency is the sadness pattern, so other-agency shifts weight away from sadness. Intent is not
+          specified, so no intentionality prediction.
+      illegitimate_obstruction:
+        description: "the writer's goal is blocked illegitimately or unfairly (high) vs for a legitimate reason (low)"
+        valence_shift: 0
+        expected: {fairness: "-1", blame: "+1"}
+        rationale: "Illegitimacy is an anger appraisal (Lazarus); it overlaps with procedural unfairness and blameworthiness."
+      confront_urge:
+        description: "urge to confront or retaliate (high) vs inclination to let it go (low)"
+        valence_shift: 0
+        expected: {blame: NA}
+        rationale: "Antagonistic action readiness is the anger action tendency (Frijda et al.)."
+
+  sadness:
+    family: affect
+    question: "How sad is the writer?"
+    anchors: {low: "not at all sad", high: "extremely sad"}
+    definition: >-
+      SADNESS = an emotional response to an irrevocable loss, typically appraised as beyond anyone's control, often
+      with low energy and withdrawal. Anger at someone who caused harm and worry about the future are not sadness.
+    source: >-
+      Lazarus, R. S. (1991). Emotion and Adaptation (core relational theme: irrevocable loss); Smith & Ellsworth (1985)
+      (low control, situational agency); Frijda et al. (1989) (helplessness, withdrawal).
+    licensing: "Theory papers; no scale items used."
+    neighbors: [anger, fear, loneliness]
+    proxies: [negative valence, low arousal]
+    indicators:
+      irrevocable_loss:
+        description: "a valued thing is lost for good (high) vs the loss is temporary and will be recovered (low)"
+        valence_shift: -1
+        expected: {}
+        rationale: "Irrevocable loss is the core relational theme of sadness (Lazarus). Losses are non-social, so no loneliness prediction."
+      uncontrollable:
+        description: "nothing anyone can do about the setback (high) vs the writer can still fix it (low)"
+        valence_shift: -1
+        expected: {fear: NA, anger: "-1"}
+        rationale: "Low situational control characterises sadness (Smith & Ellsworth); circumstance rather than agent shifts away from anger."
+      withdrawal:
+        description: "low energy and withdrawal (high) vs keeping active and engaged (low), in non-social activities"
+        valence_shift: -1
+        expected: {loneliness: NA, isolation: NA}
+        rationale: "Inactivity/withdrawal is the action readiness of sadness (Frijda et al.). Activities are non-social, but withdrawal could be read as reduced contact, so NA."
+
+  fear:
+    family: affect
+    question: "How afraid is the writer?"
+    anchors: {low: "not at all afraid", high: "extremely afraid"}
+    definition: >-
+      FEAR = an emotional response to a possible future harm, appraised as uncertain and hard to cope with, often with
+      an urge to avoid or escape. Sadness about losses that already happened is not fear.
+    source: >-
+      Smith & Ellsworth (1985) (uncertainty, low control); Lazarus (1991) (core relational theme: uncertain, existential
+      threat); Frijda et al. (1989) (avoidance).
+    licensing: "Theory papers; no scale items used."
+    neighbors: [sadness, anger]
+    proxies: [negative valence, arousal/intensity, future tense]
+    indicators:
+      future_threat:
+        description: "a harm may still happen (high) vs the danger has already passed (low)"
+        valence_shift: -1
+        expected: {}
+        rationale: "Anticipated threat is the defining appraisal of fear."
+      uncertainty:
+        description: "it is unclear whether or how the harm will happen (high) vs the outcome is already settled (low)"
+        valence_shift: 0
+        expected: {sadness: NA}
+        rationale: "Uncertainty distinguishes fear (Smith & Ellsworth); a settled bad outcome may instead invite sadness, so NA."
+      low_coping:
+        description: "the writer feels unable to cope and wants to avoid it (high) vs feels able to handle it (low)"
+        valence_shift: -1
+        expected: {}
+        rationale: "Low coping potential and avoidance readiness (Lazarus; Frijda et al.)."
+
+  loneliness:
+    family: social_connection
+    question: "How lonely is the writer?"
+    anchors: {low: "not at all lonely", high: "extremely lonely"}
+    definition: >-
+      LONELINESS = a perceived lack of meaningful connection with others: lacking companionship, feeling excluded, or
+      feeling cut off from others. It is not the same as having little contact with people or general sadness.
+    source: >-
+      Hughes, M. E., Waite, L. J., Hawkley, L. C., & Cacioppo, J. T. (2004). A short scale for measuring loneliness in
+      large surveys. Research on Aging 26(6), 655-672, doi:10.1177/0164027504268574.
+    licensing: "Published research scale; items paraphrased, not reproduced."
+    neighbors: [isolation, belonging, sadness]
+    proxies: [social contact frequency, negative valence]
+    indicators:
+      no_confidant:
+        description: "nobody to confide in (high) vs a reliable confidant (low)"
+        valence_shift: -1
+        expected: {belonging: "-1", isolation: "+1"}
+        rationale: "Lack of companionship is a scale component; confidant availability is also part of some network measures (Cornwell & Waite), so a weak isolation effect is permitted."
+      excluded:
+        description: "not invited or overlooked by others (high) vs invited and involved (low)"
+        valence_shift: -1
+        expected: {belonging: "-2", isolation: "+1"}
+        rationale: "Feeling excluded is a scale component; exclusion/rejection is also central to belonging (Malone et al.); fewer invitations can mean fewer gatherings."
+      unseen:
+        description: "feels unseen and emotionally apart from others (high) vs understood and close (low)"
+        valence_shift: -1
+        expected: {belonging: "-1"}
+        rationale: "Feeling isolated/disconnected is a scale component; it is subjective, so objective isolation is predicted null."
+
+  isolation:
+    family: social_connection
+    question: "How socially isolated is the writer in objective terms (few social ties, little contact with others)?"
+    anchors: {low: "many social ties and frequent contact", high: "almost no social ties or contact"}
+    definition: >-
+      OBJECTIVE SOCIAL ISOLATION = having few social ties, infrequent interaction with others, and little participation
+      in social activities, regardless of how the person feels about it. Feeling misunderstood or unwanted is not
+      objective isolation.
+    source: >-
+      Cornwell, E. Y., & Waite, L. J. (2009). Social disconnectedness, perceived isolation, and health among older
+      adults. Journal of Health and Social Behavior 50(1), 31-48, doi:10.1177/002214650905000103.
+    licensing: "Index components described in the paper; no items reproduced."
+    neighbors: [loneliness, belonging]
+    proxies: [mentions of being alone, negative valence]
+    indicators:
+      small_network:
+        description: "very few people in the writer's life (high) vs many friends and relatives (low)"
+        valence_shift: 0
+        expected: {loneliness: "+1", belonging: NA}
+        rationale: "Network size is a disconnectedness component; it is modestly associated with perceived isolation (Cornwell & Waite), so a weak loneliness effect is permitted."
+      rare_contact:
+        description: "rarely interacts with anyone (high) vs interacts with people daily (low)"
+        valence_shift: 0
+        expected: {loneliness: "+1", belonging: NA}
+        rationale: "Interaction frequency is a disconnectedness component; weak association with loneliness."
+      low_participation:
+        description: "takes part in no group or community activities (high) vs active in clubs and groups (low)"
+        valence_shift: 0
+        expected: {loneliness: "+1", belonging: "-1"}
+        rationale: "Social participation is a disconnectedness component; group participation also supports belonging."
+
+  belonging:
+    family: social_connection
+    question: "How strong is the writer's sense of belonging?"
+    anchors: {low: "no sense of belonging", high: "a very strong sense of belonging"}
+    definition: >-
+      BELONGING = feeling accepted and valued by a group, fitting in with it, and having stable, caring relationships.
+      How often a person meets others is not by itself belonging.
+    source: >-
+      Baumeister, R. F., & Leary, M. R. (1995). The need to belong. Psychological Bulletin 117(3), 497-529,
+      doi:10.1037/0033-2909.117.3.497; Malone, G. P., Pillow, D. R., & Osman, A. (2012). The General Belongingness
+      Scale (GBS). Personality and Individual Differences 52(3), 311-316, doi:10.1016/j.paid.2011.10.027.
+    licensing: "Published research scale; items paraphrased, not reproduced."
+    neighbors: [loneliness, isolation]
+    proxies: [positive valence, social contact]
+    indicators:
+      accepted:
+        description: "the group accepts and values the writer (high) vs rejects them (low)"
+        valence_shift: 1
+        expected: {loneliness: "-1"}
+        rationale: "Acceptance/inclusion vs rejection is a GBS component (Malone et al.)."
+      fits_in:
+        description: "the writer feels like one of the group (high) vs feels like the odd one out (low)"
+        valence_shift: 1
+        expected: {loneliness: "-1"}
+        rationale: "Fitting in / shared identity with a group."
+      lasting_bonds:
+        description: "stable, lasting caring relationships (high) vs relationships that keep falling apart (low)"
+        valence_shift: 1
+        expected: {loneliness: "-1", isolation: NA}
+        rationale: "Stable, persistent caring bonds are the second requirement of the need to belong (Baumeister & Leary)."
+
+  satisfaction:
+    family: evaluation
+    question: "How satisfied is the writer with the service, product or experience they describe?"
+    anchors: {low: "very dissatisfied", high: "very satisfied"}
+    definition: >-
+      SATISFACTION = the writer's evaluation of a specific service, product or experience: its quality, how it compared
+      with what they expected, and whether it was worth what they paid. Moods or events unrelated to it do not count.
+    source: >-
+      Oliver, R. L. (1980). A cognitive model of the antecedents and consequences of satisfaction decisions. JMR 17(4),
+      460-469, doi:10.1177/002224378001700405; Fornell, C., Johnson, M. D., Anderson, E. W., Cha, J., & Bryant, B. E.
+      (1996). The American Customer Satisfaction Index. Journal of Marketing 60(4), 7-18, doi:10.1177/002224299606000403.
+    licensing: "Conceptual model only (ACSI items are proprietary); indicators paraphrase model components."
+    neighbors: [trust, fairness]
+    proxies: [positive valence]
+    indicators:
+      quality:
+        description: "the service performed well (high) vs poorly (low)"
+        valence_shift: 1
+        expected: {trust: "+1", anger: NA}
+        rationale: "Perceived quality is an ACSI antecedent; competent performance is weak evidence of ability-based trustworthiness."
+      exceeded_expectations:
+        description: "it was better than expected (high) vs worse than expected (low), with the outcome itself described the same way"
+        valence_shift: 1
+        expected: {trust: NA}
+        rationale: "Expectation disconfirmation (Oliver)."
+      value_for_money:
+        description: "good value for the price (high) vs overpriced (low)"
+        valence_shift: 1
+        expected: {fairness: NA}
+        rationale: "Perceived value is an ACSI antecedent; price fairness is a distinct literature, so NA."
+
+  trust:
+    family: evaluation
+    question: "How much does the writer trust the person or organization they describe?"
+    anchors: {low: "no trust at all", high: "complete trust"}
+    definition: >-
+      TRUST = willingness to rely on a person or organization, based on their competence, their care for the writer's
+      interests, and their honesty and consistency. Liking a single outcome is not by itself trust.
+    source: >-
+      Mayer, R. C., Davis, J. H., & Schoorman, F. D. (1995). An integrative model of organizational trust. Academy of
+      Management Review 20(3), 709-734, doi:10.5465/amr.1995.9508080335.
+    licensing: "Theory paper; no scale items used."
+    neighbors: [satisfaction, fairness]
+    proxies: [positive valence]
+    indicators:
+      ability:
+        description: "the person/organization is competent (high) vs incompetent (low)"
+        valence_shift: 1
+        expected: {satisfaction: "+1"}
+        rationale: "Ability is one of three trustworthiness factors (Mayer et al.); competence also bears on satisfaction."
+      benevolence:
+        description: "they look out for the writer's interests (high) vs only for their own (low)"
+        valence_shift: 1
+        expected: {fairness: NA, satisfaction: NA}
+        rationale: "Benevolence (Mayer et al.)."
+      integrity:
+        description: "they keep promises and tell the truth (high) vs break promises and mislead (low)"
+        valence_shift: 1
+        expected: {fairness: "+1", blame: NA}
+        rationale: "Integrity (Mayer et al.); honesty overlaps with informational justice (Colquitt)."
+
+  fairness:
+    family: evaluation
+    question: "How fairly does the writer think they were treated?"
+    anchors: {low: "very unfairly", high: "very fairly"}
+    definition: >-
+      PERCEIVED FAIRNESS = the writer's judgement that outcomes matched contributions, that decisions followed
+      consistent and unbiased procedures, and that they were treated with dignity and respect. Getting a good outcome is
+      not by itself fair treatment.
+    source: >-
+      Colquitt, J. A. (2001). On the dimensionality of organizational justice: A construct validation of a measure.
+      Journal of Applied Psychology 86(3), 386-400, doi:10.1037/0021-9010.86.3.386.
+    licensing: "Published measure; items paraphrased, not reproduced."
+    neighbors: [trust, anger, satisfaction]
+    proxies: [positive valence, favourable outcome]
+    indicators:
+      distributive:
+        description: "the outcome matched the writer's contribution (high) vs did not (low)"
+        valence_shift: 1
+        expected: {anger: "-1", satisfaction: NA, trust: NA}
+        rationale: "Distributive justice (Colquitt); unfair outcomes are a classic anger elicitor."
+      procedural:
+        description: "the decision followed consistent, unbiased rules with a chance to be heard (high) vs arbitrary or biased rules (low)"
+        valence_shift: 1
+        expected: {anger: "-1", trust: "+1"}
+        rationale: "Procedural justice (Colquitt); procedural fairness supports institutional trust."
+      interpersonal:
+        description: "treated with dignity and respect (high) vs rudely or demeaningly (low)"
+        valence_shift: 1
+        expected: {anger: "-1", trust: NA}
+        rationale: "Interpersonal justice (Colquitt)."
+
+  blame:
+    family: agency_politics
+    question: "How much does the writer blame someone for what happened?"
+    anchors: {low: "no blame at all", high: "a great deal of blame"}
+    definition: >-
+      BLAME = a judgement that a person is responsible for a bad outcome: they caused it, they could and should have
+      prevented it, and they had no good reason for acting as they did. Feeling upset is not by itself blame.
+    source: >-
+      Malle, B. F., Guglielmo, S., & Monroe, A. E. (2014). A theory of blame. Psychological Inquiry 25(2), 147-186,
+      doi:10.1080/1047840X.2014.877340.
+    licensing: "Theory paper; no scale items used."
+    neighbors: [anger, intentionality, fairness]
+    proxies: [negative valence, presence of a human agent]
+    indicators:
+      agent_caused:
+        description: "a person caused the bad outcome (high) vs a non-human cause (low); harm falls on a third party"
+        valence_shift: 0
+        expected: {anger: "+1", intentionality: NA}
+        rationale: "Causal agency is the first step of blame (Malle et al.); harm to others can still evoke moral anger."
+      preventable:
+        description: "the person could and should have prevented it (high) vs could not have known or prevented it (low)"
+        valence_shift: 0
+        expected: {anger: "+1", intentionality: "0"}
+        rationale: "Obligation and capacity to prevent (Malle et al.); preventability is distinct from intent."
+      unjustified:
+        description: "the person acted without a good reason (high) vs had a good reason such as an emergency (low)"
+        valence_shift: 0
+        expected: {anger: "+1", intentionality: NA, fairness: NA}
+        rationale: "Justifying reasons mitigate blame (Malle et al.)."
+
+  intentionality:
+    family: agency_politics
+    question: "How intentionally did the person described in the text act?"
+    anchors: {low: "not at all intentionally", high: "fully intentionally"}
+    definition: >-
+      INTENTIONALITY = the degree to which an action was done on purpose: the person wanted the outcome, decided to act
+      in advance, and was aware of what they were doing. Whether the outcome was good or bad is irrelevant.
+    source: >-
+      Malle, B. F., & Knobe, J. (1997). The folk concept of intentionality. Journal of Experimental Social Psychology
+      33(2), 101-121, doi:10.1006/jesp.1996.1314.
+    licensing: "Theory paper; no scale items used."
+    neighbors: [blame]
+    proxies: [presence of a human agent, negative valence]
+    indicators:
+      desire:
+        description: "the person wanted the outcome (high) vs did not want it (low); outcomes are neutral"
+        valence_shift: 0
+        expected: {blame: "0"}
+        rationale: "Desire is a component of the folk concept (Malle & Knobe). Outcomes are neutral, so blame is predicted null."
+      planned:
+        description: "the person decided and planned it in advance (high) vs it happened on the spur of the moment by slip (low)"
+        valence_shift: 0
+        expected: {blame: "0"}
+        rationale: "Intention/deliberation (Malle & Knobe)."
+      aware:
+        description: "the person was fully aware of what they were doing (high) vs absent-minded and unaware (low)"
+        valence_shift: 0
+        expected: {blame: "0"}
+        rationale: "Awareness (Malle & Knobe)."
+
+  political_stance:
+    family: agency_politics
+    question: "Where does the writer stand politically?"
+    anchors: {low: "clearly progressive (left-leaning)", high: "clearly conservative (right-leaning)"}
+    definition: >-
+      POLITICAL STANCE = the writer's position on a left-right axis, inferred from the positions they support:
+      accepting economic inequality rather than reducing it, preferring tradition to social change, and favouring
+      punishment over rehabilitation are right-leaning; the opposites are left-leaning. Tone and topic alone are not
+      evidence.
+    source: >-
+      Jost, J. T., Federico, C. M., & Napier, J. L. (2009). Political ideology: Its structure, functions, and elective
+      affinities. Annual Review of Psychology 60, 307-337, doi:10.1146/annurev.psych.60.110707.163600; Feldman, S., &
+      Johnston, C. (2014). Understanding the determinants of political ideology. Political Psychology 35(3), 337-358,
+      doi:10.1111/pops.12055.
+    licensing: "Theory papers; no scale items used."
+    notes: "US-centred left-right axis. Rating is bipolar (1 = progressive, 5 = conservative)."
+    neighbors: []
+    proxies: [policy topic, tone]
+    indicators:
+      economic:
+        description: "opposes redistribution to reduce inequality (high) vs supports it (low)"
+        valence_shift: 0
+        expected: {}
+        rationale: "Acceptance vs rejection of inequality (Jost et al.); economic dimension (Feldman & Johnston)."
+      social_change:
+        description: "prefers tradition (high) vs supports social change (low)"
+        valence_shift: 0
+        expected: {}
+        rationale: "Resistance to vs advocacy of change (Jost et al.); social dimension (Feldman & Johnston)."
+      criminal_justice:
+        description: "favours tougher punishment (high) vs rehabilitation (low)"
+        valence_shift: 0
+        expected: {}
+        rationale: "A policy domain aligned with the left-right axis in US politics; tone is held constant across poles."
